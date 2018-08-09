@@ -242,34 +242,34 @@ if __name__ == "__main__":
     log.info(block_head)
     test_receive_newblock(test)
 
-    # Make contract code
-    serpent_code = '''
-def main(a,b):
-    return(a ^ b)
-    '''
-    state = State(block_head.state_root, test.services.chain.chain.env)
-    log.info('Andy accounts\' coin amount: ' + str(state.get_balance(accounts_list[Andy].address)))
-    # Make transaction with contract, sender of transaction is 'Andy', receiver is 'Choi'
-    tx = test_send_transaction_with_contract(test, serpent_code, sender_id=Andy, receiver_id=Choi)
-    log.info(tx.__dict__)
-    log.info(tx.sender.encode('hex'))
-
-    # Check latest block, Not mining yet
-    block_head= test.services.chain.chain.head
-    state = State(block_head.state_root, test.services.chain.chain.env)
-    log.info('Andy accounts\' coin amount: ' + str(state.get_balance(accounts_list[Andy].address)))
-
-    # Mine next block
-    test.mine_next_block()
-
-    # Check latest block
-    block_head = test.services.chain.chain.head
-    state = State(block_head.state_root, test.services.chain.chain.env)
-    log.info('Andy accounts\' coin amount: ' + str(state.get_balance(accounts_list[Andy].address)))
-
-    # Find block contain tx by hash
-    block_tx = test.services.chain.chain.get_transaction(tx.hash)
-    log.info(block_tx)
+#     # Make contract code
+#     serpent_code = '''
+# def main(a,b):
+#     return(a ^ b)
+#     '''
+#     state = State(block_head.state_root, test.services.chain.chain.env)
+#     log.info('Andy accounts\' coin amount: ' + str(state.get_balance(accounts_list[Andy].address)))
+#     # Make transaction with contract, sender of transaction is 'Andy', receiver is 'Choi'
+#     tx = test_send_transaction_with_contract(test, serpent_code, sender_id=Andy, receiver_id=Choi)
+#     log.info(tx.__dict__)
+#     log.info(tx.sender.encode('hex'))
+#
+#     # Check latest block, Not mining yet
+#     block_head= test.services.chain.chain.head
+#     state = State(block_head.state_root, test.services.chain.chain.env)
+#     log.info('Andy accounts\' coin amount: ' + str(state.get_balance(accounts_list[Andy].address)))
+#
+#     # Mine next block
+#     test.mine_next_block()
+#
+#     # Check latest block
+#     block_head = test.services.chain.chain.head
+#     state = State(block_head.state_root, test.services.chain.chain.env)
+#     log.info('Andy accounts\' coin amount: ' + str(state.get_balance(accounts_list[Andy].address)))
+#
+#     # Find block contain tx by hash
+#     block_tx = test.services.chain.chain.get_transaction(tx.hash)
+#     log.info(block_tx)
     # Reuse contract
     while True:
         peers = test.services.peermanager.peers

@@ -38,6 +38,6 @@ class PeerMock(object):
 def test_receive_newblock(app):
     eth = eth_service.ChainService(app)
     proto = eth_protocol.ETHProtocol(PeerMock(app), eth)
-    d = eth_protocol.ETHProtocol.newblock.decode_payload(decode_hex(newblk_rlp))
-    eth.on_receive_newblock(proto, **d)
+    proto.service.app.config['eth'] = dict(network_id=1337)
+    proto.start()
     return app
