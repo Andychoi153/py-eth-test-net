@@ -2,6 +2,8 @@ import pyethapp
 import os
 import subprocess
 
+from p2p_lib import test_receive_newblock
+
 from builtins import str
 from itertools import count
 import pytest
@@ -82,13 +84,13 @@ def test_app(tmpdir):
         'db': {'implementation': 'EphemDB'},
         'pow': {'activated': False},
         'p2p': {
-            'min_peers': 0,
-            'max_peers': 0,
+            'min_peers': 1,
+            'max_peers': 3,
             'listen_port': 29873
         },
         'node': {'privkey_hex': encode_hex(mk_random_privkey())},
         'discovery': {
-            'boostrap_nodes': [],
+            'boostrap_nodes': ['192.168.219.104'],
             'listen_port': 29873
         },
         'eth': {
@@ -108,6 +110,9 @@ def test_app(tmpdir):
     services = [DBService, AccountsService, PeerManager, ChainService, PoWService, Console]
     update_config_with_defaults(config, get_default_config([TestApp] + services))
     update_config_with_defaults(config, {'eth': {'block': ethereum.config.default_config}})
+    config['eth']['network_id'] = 1337
+    config['p2p']['listen_host'] = '172.30.1.8'
+    config
     app = TestApp(config)
     for service in services:
         service.register_with_app(app)
@@ -216,6 +221,7 @@ def test_console_name_reg_contract(test_app):
 
 
 if __name__ == "__main__":
+    import time
     # Test pyethapp by using console_service lib.
     # Generate Temp file if necessary. local directory is ~/py-eth-test-net/test.txt
     tmpdir = os.path.dirname(__file__)
@@ -234,6 +240,7 @@ if __name__ == "__main__":
     # Check latest block
     block_head = test.services.chain.chain.head
     log.info(block_head)
+    test_receive_newblock(test)
 
     # Make contract code
     serpent_code = '''
@@ -263,7 +270,9 @@ def main(a,b):
     # Find block contain tx by hash
     block_tx = test.services.chain.chain.get_transaction(tx.hash)
     log.info(block_tx)
-
     # Reuse contract
-    if tx is not None:
-        pass
+    while True:
+        peers = test.services.peermanager.peers
+        test_receive_newblock(test)
+        print(peers)
+        time.sleep(2)
