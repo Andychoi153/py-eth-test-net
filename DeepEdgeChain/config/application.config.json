@@ -1,0 +1,19 @@
+{
+    "db": {"implementation": "EphemDB"},
+    "p2p": {
+        "min_peers": 1,
+        "max_peers": 3,
+        "listen_port": 30303
+    },
+    "discovery": {
+       "listen_port": 30303
+    },
+    "eth": {
+        "block": {
+            "GENESIS_DIFFICULTY": 1,
+            "BLOCK_DIFF_FACTOR": 2,
+            "GENESIS_GAS_LIMIT": 3141592
+        }
+    },
+    "jsonrpc": {"listen_port": 30303}
+}
