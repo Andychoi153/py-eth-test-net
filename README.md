@@ -9,3 +9,5 @@ py-ethereum test net for edge blockchain
 - sudo apt install libssl-dev
 - set solidty compile by py-solc
 - solidity version == 0.4.12
+
+
