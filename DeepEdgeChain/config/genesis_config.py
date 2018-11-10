@@ -7,6 +7,7 @@ from pyethapp.config import update_config_with_defaults, get_default_config
 
 from ethereum.utils import encode_hex
 from ethereum.config import default_config
+from ethereum.tools import tester
 
 from devp2p.peermanager import PeerManager
 
@@ -14,19 +15,12 @@ import json
 import socket
 import fcntl
 import struct
+import os
 
 
-json_data = open('application.config.json').read()
-config = json.load(json_data)
-
-
-def get_ip_address(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
-        s.fileno(),
-        0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
-    )[20:24])
+dir = os.path.dirname(os.path.realpath('__file__'))
+json_data = open(dir+'/DeepEdgeChain/config/application.config.json').read()
+config = json.loads(json_data)
 
 
 def setting_config(app, tmpdir, bootstrap_nodes=None):
@@ -37,12 +31,21 @@ def setting_config(app, tmpdir, bootstrap_nodes=None):
 
     config['data_dir'] = str(tmpdir)
 
-    config['p2p']['bootstrap_nodes'] = bootstrap_nodes
-    config['discovery']['bootstrap_nodes'] = bootstrap_nodes
+    if bootstrap_nodes is not None:
+        config['p2p']['bootstrap_nodes'] = bootstrap_nodes
+        config['discovery']['bootstrap_nodes'] = bootstrap_nodes
+
     config['node'] = {'privkey_hex': encode_hex(mk_random_privkey())}
     config['pow'] = {'activated': True}
     config['eth']['network_id'] = 1337
-    config['p2p']['listen_host'] = get_ip_address('eth0')
+    config['eth']['block']['GENESIS_INITIAL_ALLOC'] = {
+                    encode_hex(tester.accounts[0]): {'balance': 10**24},
+                    encode_hex(tester.accounts[1]): {'balance': 1},
+                    encode_hex(tester.accounts[2]): {'balance': 10**24},
+                    encode_hex(tester.accounts[3]): {'balance': 10 ** 24},
+
+    }
+    config['p2p']['listen_host'] = '127.0.0.1'
 
     services = [DBService, AccountsService, PeerManager, ChainService, PoWService, Console]
     update_config_with_defaults(config, get_default_config([app] + services))
