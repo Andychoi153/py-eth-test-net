@@ -3,6 +3,7 @@ from pyethapp.accounts import Account
 
 from ethereum.slogging import get_logger, configure_logging
 from ethereum.pow.ethpow import mine
+from ethereum.tools import tester
 
 from itertools import count
 
@@ -15,12 +16,16 @@ class EdgeChainApp(EthApp):
     def start(self):
         super(EdgeChainApp, self).start()
         log.debug('adding test accounts')
+        self.services.accounts.add_account(Account.new('ADMIN', tester.keys[0]), store=False)
+        self.services.accounts.add_account(Account.new('MES', tester.keys[1]), store=False)
+        self.services.accounts.add_account(Account.new('REQUESTER1', tester.keys[2]), store=False)
+        self.services.accounts.add_account(Account.new('REQUESTER2', tester.keys[3]), store=False)
 
     def add_accounts(self, user_id, locked=False):
         account = Account.new(user_id)
         if locked:
             account.lock()
-        self.services.accounts.add_account(account)
+        self.services.accounts.add_account(account, store=False)
 
     def mine_next_block(self):
         """Mine until a valid nonce is found.
