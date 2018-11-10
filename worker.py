@@ -1,4 +1,4 @@
-from DeepEdgeChain.app import app
+from DeepEdgeChain.app.app import EdgeChainApp
 from DeepEdgeChain.config import genesis_config
 from DeepEdgeChain.log import log
 
@@ -9,18 +9,22 @@ from multiprocessing import Process
 
 
 class Worker(Process):
+
     def __init__(self, dir):
-        self._app = app.EdgeChainApp()
+        self._app = EdgeChainApp()
         self._dir = dir
+        self._pool = []
+        self._in_block = []
 
     def run(self):
         config, services= genesis_config.setting_config(self._app, self._dir)
-        App = app.EdgeChainApp(config)
+        self.App = EdgeChainApp(config)
 
         for service in services:
-            service.register_with_app(App)
+            service.register_with_app(self.App)
 
         log.debug('starting app')
-        App.start()
+        self.App.start()
+
 
         # TODO: Interworking with MES, SES Requester controller
