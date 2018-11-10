@@ -16,5 +16,4 @@ def send_transaction(app, sender_id, receiver_id,value):
     eth = app.services.console.console_locals['eth']
     tx = eth.transact(to=receiver, value=value, startgas=500000, sender=sender)
 
-    app.mine_next_block()
     return tx
