@@ -28,6 +28,7 @@ ethereum.tools.keys.PBKDF2_CONSTANTS['c'] = 100
 configure_logging(':trace')
 log = get_logger('test.console_service')
 
+
 def test_app(tmpdir):
 
     class TestApp(EthApp):
@@ -109,9 +110,9 @@ def test_app(tmpdir):
     services = [DBService, AccountsService, PeerManager, ChainService, PoWService, Console]
     update_config_with_defaults(config, get_default_config([TestApp] + services))
     update_config_with_defaults(config, {'eth': {'block': ethereum.config.default_config}})
-    config['eth']['network_id'] = 2
-    config['p2p']['listen_host'] = '192.168.219.106'
-    config['discovery']['listen_host'] = '192.168.219.106'
+    config['eth']['network_id'] = 1337
+    config['p2p']['listen_host'] = '192.168.0.3'
+    config['discovery']['listen_host'] = '192.168.0.3'
     app = TestApp(config)
     for service in services:
         service.register_with_app(app)
