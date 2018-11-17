@@ -151,7 +151,7 @@ class SendValueAccountToAccount(Resource):
             return {'error': str(e)}
 
 
-class CreateTransactionByContract(Resource):
+class SendDetectData(Resource):
     def post(self):
         # Example json format
         #{ 'req_addr': 'req-256',
@@ -169,19 +169,24 @@ class CreateTransactionByContract(Resource):
             parser.add_argument('req_addr', type=str)
             parser.add_argument('data', type=dict)
             parser.add_argument('time_stamp', type=str)
+            parser.add_argument('db_image', type=bytes)
             # log.debug(parser['ses_addr'])
 
             args = parser.parse_args()
+            _eth_worker._pool.append({
+                'Requester': args['req_addr'],
+                'data': {
+                    'hash': args['data']['hash'],
+                    'solution': {
+                        'name': args['data']['sol']['name'],
+                        'age': args['data']['sol']['age']
+                    },
+                'time_stamp': args['time_stamp']
+                }
 
-            console_name_reg_contract_v2(App,
-                                         contract_code,
-                                         sender_id=ENUMS[args['req_addr']],
-                                         receiver_id=ENUMS['MES'],
-                                         hashData=args['data']['hash'],
-                                         name=args['data']['sol']['name'],
-                                         age=args['data']['sol']['age'],
-                                         time_stamp=args['time_stamp']
-                                         )
+            })
+
+            _eth_worker._detected_image = args['db_image']
 
             log.debug(args)
             # TODO: Create Solidity compile code when begin worker
@@ -198,21 +203,95 @@ class MiningBlock(Resource):
     def post(self):
         try:
             App = _eth_worker.App
-            App.mine_next_block()
+            temp = _eth_worker._pool
+            for pool in temp:
+                console_name_reg_contract_v2(App,
+                                             contract_code,
+                                             sender_id=ENUMS[pool['Requester']],
+                                             receiver_id=ENUMS['MES'],
+                                             hashData=str(pool['data']['hash']),
+                                             name=str(pool['data']['solution']['name']),
+                                             age=str(pool['data']['solution']['age']),
+                                             time_stamp=pool['time_stamp']
+                                             )
+
             _eth_worker._in_block = _eth_worker._pool
             _eth_worker._pool = []
+
+            mined_block = App.mine_next_block()
+            for pool in temp:
+                pool.update({
+                    'Block hash': mined_block.hash
+                })
+
+            _eth_worker._in_block.append(temp)
+            _eth_worker._pool = []
+
             return {'status': 200}
 
         except Exception as e:
             return {'error': str(e)}
 
 
+class ImagePacket(Resource):
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('image_packet', type=bytes)
+            args = parser.parse_args()
+
+            _eth_worker._image_packet = args['image_packet']
+
+            return {'status': 200}
+
+        except Exception as e:
+            return {'error': str(e)}
+
+
+class SendFrame(Resource):
+    def post(self):
+        try:
+            temp_worker = _eth_worker
+
+            return {'status': 200,
+                    'imag_packet': temp_worker._image_packet,
+                    'detected_image': temp_worker._detected_image,
+                    'sol': temp_worker._detected_image_sol}
+        except Exception as e:
+            return {'error': str(e)}
+
+
+class SendBlockInfo(Resource):
+    def post(self):
+        try:
+            pool = _eth_worker._pool
+            in_block = _eth_worker._in_block
+
+            return {
+                'status': 200,
+                'pool_list':  pool,
+                'in_block': in_block
+            }
+        except Exception as e:
+            return  {
+                'error': str(e)
+            }
+
+
+# For Frontend
 api.add_resource(GetAccount, '/get_account')
+api.add_resource(SendValueAccountToAccount, '/send_value_account_to_account')
+api.add_resource(SendBlockInfo, '/send_block_info')
+api.add_resource(MiningBlock, '/mining_block')
+api.add_resource(SendFrame, '/send_frame')
+
+# For Requester
+api.add_resoource(ImagePacket, '/image_packet')
+api.add_resource(SendDetectData, '/send_detect_data')
+
+# Not used
 api.add_resource(GetTransactionPool, '/get_transaction_from_pool')
 api.add_resource(GetTransactionFromBlockHeader, '/get_transaction_from_block_header')
-api.add_resource(SendValueAccountToAccount, '/send_value_account_to_account')
-api.add_resource(CreateTransactionByContract, '/create_transaction_by_contract')
-api.add_resource(MiningBlock, '/mining_block')
 
 
 if __name__ == '__main__':
