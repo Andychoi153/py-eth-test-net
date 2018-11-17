@@ -1,52 +1,31 @@
-contract_code = """pragma solidity ^0.4.0;
-
+contract_code = """pragma solidity ^0.4.12;
 contract DataStruct {
-
-    struct ResultForm{
-        string id;
-        uint hashData;
-        string name;
-        uint age;
-        string time;
-    }
-        
-    address MES;
-    ResultForm Result;
-
-    function setMESAddress(address _MES){
-        MES = _MES;
+    string hashData;
+    string name;
+    string age;
+    string time;
+    
+    function writeResult(string _hashData, string _name, string _age, string _time) {
+        hashData = _hashData;
+        name = _name;
+        age = _age;
+        time = _time;
     }
     
-    function writeResult(uint _hashData, string _name, uint _age, string _time) public{
-        Result.hashData = _hashData;
-        Result.name = _name;
-        Result.age = _age;
-        Result.time = _time;
+    function getHashData() constant public returns (string) {
+        return hashData;
     }
     
-    function getMESAddress() constant public returns(address){
-        return MES;
+    function getName() constant public returns (string) {
+        return name;
     }
     
-    
-    function getHashData() constant public returns(uint){
-        return Result.hashData;
+    function getAge() constant public returns (string) {
+        return age;
     }
     
-    function getName() constant public returns(string){
-        return Result.name;
-    }
-    
-    function getAge() constant public returns(uint){
-        return Result.age;
-    }
-    
-    function getTime() constant public returns(string){
-        return Result.time;
-    }
-    
-    function confirmResult() public payable{
-        MES.transfer(msg.value);
+    function getTime() constant public returns (string) {
+        return time;
     }
     
 }"""
