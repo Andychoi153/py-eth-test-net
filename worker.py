@@ -15,6 +15,9 @@ class Worker(Process):
         self._dir = dir
         self._pool = []
         self._in_block = []
+        self._image_packet = None
+        self._detected_image = None
+        self._detected_image_sol = None
 
     def run(self):
         config, services= genesis_config.setting_config(self._app, self._dir)
