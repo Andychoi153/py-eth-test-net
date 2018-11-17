@@ -40,9 +40,9 @@ def setting_config(app, tmpdir, bootstrap_nodes=None):
     config['eth']['network_id'] = 1337
     config['eth']['block']['GENESIS_INITIAL_ALLOC'] = {
                     encode_hex(tester.accounts[0]): {'balance': 10**24},
-                    encode_hex(tester.accounts[1]): {'balance': 1},
+                    encode_hex(tester.accounts[1]): {'balance': 10**24},
                     encode_hex(tester.accounts[2]): {'balance': 10**24},
-                    encode_hex(tester.accounts[3]): {'balance': 10 ** 24},
+                    encode_hex(tester.accounts[3]): {'balance': 10 **24},
 
     }
     config['p2p']['listen_host'] = '127.0.0.1'
