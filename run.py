@@ -186,7 +186,15 @@ class SendDetectData(Resource):
 
             })
 
-            _eth_worker._detected_image = args['db_image']
+            address = args['req_addr']
+
+            if address == 'REQUESTER1':
+                _eth_worker._detected_image1 = args['db_image']
+                _eth_worker._detected_image_sol1 = args['data']['solution']
+
+            else:
+                _eth_worker._detected_image1 = args['db_image']
+                _eth_worker._detected_image_sol1 = args['data']['solution']
 
             log.debug(args)
             # TODO: Create Solidity compile code when begin worker
@@ -240,7 +248,15 @@ class ImagePacket(Resource):
             parser.add_argument('image_packet', type=bytes)
             args = parser.parse_args()
 
-            _eth_worker._image_packet = args['image_packet']
+            data = args['image_packet']
+
+            address = args['req_addr']
+            if address == 'REQUESTER1':
+                _eth_worker._image_packet1 = data
+            else:
+                _eth_worker._image_packet2 = data
+
+            log.debug('get packet')
 
             return {'status': 200}
 
@@ -254,9 +270,13 @@ class SendFrame(Resource):
             temp_worker = _eth_worker
 
             return {'status': 200,
-                    'imag_packet': temp_worker._image_packet,
-                    'detected_image': temp_worker._detected_image,
-                    'sol': temp_worker._detected_image_sol}
+                    'image_packet1': temp_worker._image_packet1,
+                    'detected_image1': temp_worker._detected_image1,
+                    'sol1': temp_worker._detected_image_sol1,
+                    'image_packet2': temp_worker._image_packet2,
+                    'detected_image2': temp_worker._detected_image2,
+                    'sol2': temp_worker._detected_image_sol2
+                    }
         except Exception as e:
             return {'error': str(e)}
 
@@ -273,26 +293,26 @@ class SendBlockInfo(Resource):
                 'in_block': in_block
             }
         except Exception as e:
-            return  {
+            return {
                 'error': str(e)
             }
 
 
 # For Frontend
 api.add_resource(GetAccount, '/get_account')
-api.add_resource(SendValueAccountToAccount, '/send_value_account_to_account')
 api.add_resource(SendBlockInfo, '/send_block_info')
-api.add_resource(MiningBlock, '/mining_block')
 api.add_resource(SendFrame, '/send_frame')
 
 # For Requester
-api.add_resoource(ImagePacket, '/image_packet')
+api.add_resource(ImagePacket, '/image_packet')
 api.add_resource(SendDetectData, '/send_detect_data')
+
 
 # Not used
 api.add_resource(GetTransactionPool, '/get_transaction_from_pool')
 api.add_resource(GetTransactionFromBlockHeader, '/get_transaction_from_block_header')
-
+api.add_resource(SendValueAccountToAccount, '/send_value_account_to_account')
+api.add_resource(MiningBlock, '/mining_block')
 
 if __name__ == '__main__':
     print('begin server')

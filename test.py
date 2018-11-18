@@ -6,7 +6,6 @@ from multiprocessing import Process
 from DeepEdgeChain.core.transaction import send_transaction
 from DeepEdgeChain.core.smart_contract import *
 from DeepEdgeChain.util.read_block_thread import ReadBlockThread
-from DeepEdgeChain.config.contract_code import contract_code
 
 import time
 import os
@@ -39,7 +38,8 @@ class Test(Process):
         # send_transaction(test_App, receiver_id=0, sender_id=1, value=1000)
 
         # Smart contract create
-        example_solidity_code = '''contract NameReg  {
+        example_solidity_code = '''
+        contract NameReg  {
            event AddressRegistered(bytes32 indexed name, address indexed account);
            mapping (address => bytes32) toName;
            function register(bytes32 name) {
@@ -56,21 +56,25 @@ class Test(Process):
         cnnOut = 2
         example_v2_version_code = contract_code
 
-        # console_name_reg_contract(test_App,
-        #                           example_solidity_code,
-        #                           reg_id='Example',
-        #                           sender_id='Joseph',
-        #                           receiver_id='Andy')
-        print('add_block')
-        console_name_reg_contract_v2(test_App,
-                                     example_v2_version_code,
-                                     sender_id=0,
-                                     receiver_id=1,
-                                     hashData=hash(str(cnnOut)),
-                                     name='hello',
-                                     age=23,
-                                     time_stamp='20181201'
-                                     )
+        result, tx = console_name_reg_contract(test_App,
+                                  example_solidity_code,
+                                  reg_id='Example',
+                                  sender_id='Joseph',
+                               receiver_id='Andy')
+        # print('add_block')
+        # console_name_reg_contract_v2(test_App,
+        #                              example_v2_version_code,
+        #                              sender_id=0,
+        #                              receiver_id=1,
+        #                              hashData=hash(str(cnnOut)),
+        #                              name='hello',
+        #                              age=23,
+        #                              time_stamp='20181201'
+        #                             )
+        print('startlog')
+        print(result)
+        print(tx)
+        print('endlog')
         print('add_block complete')
         ReadBlockThread(test_App)
         time.sleep(2)
