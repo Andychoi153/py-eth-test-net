@@ -1,4 +1,5 @@
 import pytest
+from DeepEdgeChain.core.transaction import send_transaction
 
 
 def console_name_reg_contract(app, solidity_code, reg_id, sender_id, receiver_id):
@@ -101,6 +102,8 @@ def console_name_reg_contract_v2(app,
                                  name,
                                  age,
                                  time_stamp)
+
+        txp = send_transaction(app, sender_id, receiver_id, 100000000000000000000000)
 
         # print(address_test)
         app.mine_next_block()
