@@ -284,19 +284,74 @@ class SendFrame(Resource):
 class SendBlockInfo(Resource):
     def post(self):
         try:
-            pool = _eth_worker._pool
-            in_block = _eth_worker._in_block
+            pool = []
+            for i in _eth_worker._pool:
+                pool.append(str(i))
+            in_block = []
+            for i in _eth_worker._in_block:
+                in_block.append(str(i))
+
+
 
             return {
-                'status': 200,
-                'pool_list':  pool,
-                'in_block': in_block
+                "status": 200,
+                "pool_list":  pool,
+                "in_block": in_block
             }
         except Exception as e:
             return {
                 'error': str(e)
             }
 
+
+import threading
+import time
+
+
+class MineBlock:
+    def __init__(self):
+        thread = threading.Thread(target=self.run, args=())
+        thread.daemon = True
+        thread.start()
+        self.count = 0
+
+    def run(self):
+        while True:
+            time.sleep(3)
+            if len(_eth_worker._pool) > 0:
+                App = _eth_worker.App
+                temp = _eth_worker._pool
+                for pool in temp:
+                    console_name_reg_contract_v2(App,
+                                                 contract_code,
+                                                 sender_id=ENUMS[pool['Requester']],
+                                                 receiver_id=ENUMS['MES'],
+                                                 hashData=str(pool['data']['hash']),
+                                                 name=str(pool['data']['solution']['name']),
+                                                 age=str(pool['data']['solution']['age']),
+                                                 time_stamp=pool['time_stamp']
+                                                 )
+
+                _eth_worker._pool = []
+
+                mined_block = App.mine_next_block()
+                for pool in temp:
+                    pool.update({
+                        "Block hash": mined_block.hash
+                    })
+
+                    _eth_worker._in_block.append(pool)
+                _eth_worker._pool = []
+                # self.count = self.count +1
+            time.sleep(2)
+            _eth_worker._detected_image_sol1 = None
+            _eth_worker._detected_image_sol2 = None
+            _eth_worker._detected_image1 = None
+            _eth_worker._detected_image2 = None
+            # if self.count >2:
+            #     break
+
+MineBlock()
 
 # For Frontend
 api.add_resource(GetAccount, '/get_account')
