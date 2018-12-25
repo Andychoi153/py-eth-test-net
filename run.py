@@ -44,7 +44,7 @@ class GetAccount(Resource):
             block_head = App.services.chain.chain.head
             state = State(block_head.state_root, App.services.chain.chain.env)
             log.info(state.get_balance(account_info.address))
-            balance_amount = float(state.get_balance(account_info.address))
+            balance_amount = int(state.get_balance(account_info.address)/10**22)
 
 
             # TODO: account info parsing
@@ -169,34 +169,34 @@ class SendDetectData(Resource):
             parser.add_argument('req_addr', type=str)
             parser.add_argument('data', type=dict)
             parser.add_argument('time_stamp', type=str)
-            parser.add_argument('db_image', type=bytes)
+            parser.add_argument('db_image', type=str)
             # log.debug(parser['ses_addr'])
 
             args = parser.parse_args()
             _eth_worker._pool.append({
-                'Requester': args['req_addr'],
-                'data': {
-                    'hash': args['data']['hash'],
+                "Requester": args['req_addr'],
+                "data": {
+                    'hash': str(args['data']['hash']),
                     'solution': {
                         'name': args['data']['sol']['name'],
                         'age': args['data']['sol']['age']
                     },
-                'time_stamp': args['time_stamp']
-                }
-
+                },
+                "time_stamp": args['time_stamp']
             })
 
             address = args['req_addr']
 
             if address == 'REQUESTER1':
                 _eth_worker._detected_image1 = args['db_image']
-                _eth_worker._detected_image_sol1 = args['data']['solution']
+                _eth_worker._detected_image_sol1 = args['data']['sol']
+                log.debug('receive packet from requester1')
+
 
             else:
-                _eth_worker._detected_image1 = args['db_image']
-                _eth_worker._detected_image_sol1 = args['data']['solution']
+                _eth_worker._detected_image2 = args['db_image']
+                _eth_worker._detected_image_sol2 = args['data']['sol']
 
-            log.debug(args)
             # TODO: Create Solidity compile code when begin worker
             # TODO: And name register to that Solidity code then call that code
             # TODO: And make transaction
@@ -229,7 +229,7 @@ class MiningBlock(Resource):
             mined_block = App.mine_next_block()
             for pool in temp:
                 pool.update({
-                    'Block hash': mined_block.hash
+                    "Block hash": str(mined_block.hash)
                 })
 
             _eth_worker._in_block.append(temp)
@@ -245,7 +245,9 @@ class ImagePacket(Resource):
     def post(self):
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('image_packet', type=bytes)
+            parser.add_argument('req_addr', type=str)
+            parser.add_argument('image_packet', type=str)
+
             args = parser.parse_args()
 
             data = args['image_packet']
@@ -253,6 +255,8 @@ class ImagePacket(Resource):
             address = args['req_addr']
             if address == 'REQUESTER1':
                 _eth_worker._image_packet1 = data
+                log.debug('get packet from req 1')
+
             else:
                 _eth_worker._image_packet2 = data
 
