@@ -1,6 +1,7 @@
 addr = [1,2]
 cnnOut = 2
 import requests
+import time
 import json
 
 
@@ -17,18 +18,21 @@ def test_demo_scenario():
     response = requests.post('http://127.0.0.1:5000/get_account', json=data)
     print('MES')
     print(response.text)
+    assert response.text is not None
 
     data = {'account': 'REQUESTER1'}
 
     response = requests.post('http://127.0.0.1:5000/get_account', json=data)
     print('REQUESTER1')
     print(response.text)
+    assert response.text is not None
+
 
 
     response = requests.post('http://127.0.0.1:5000/get_account', json=data)
     print('REQUESTER1')
     print(response.text)
-    assert result is not None
+    assert response.text is not None
 
     data = {'req_addr': 'REQUESTER1',
             'data': {'hash': hash(str(cnnOut)),
@@ -38,17 +42,29 @@ def test_demo_scenario():
             'time_stamp': '201821199'
             }
 
-    response = requests.post('http://127.0.0.1:5000/create_transaction_by_contract', json=data)
-    print(response.text)
+    response = requests.post('http://127.0.0.1:5000/send_detect_data', json=data)
+    assert response.text is not None
 
     data = {'account': 'MES'}
 
+    time.sleep(5)
+    response = requests.post('http://127.0.0.1:5000/send_block_info')
+    assert response.text is not None
+
     response = requests.post('http://127.0.0.1:5000/get_account', json=data)
     print('MES')
-    print(response.text)
+    assert response.text is not None
+
+    response = requests.post('http://127.0.0.1:5000/get_account', json=data)
+    print('MES')
+    assert response.text is not None
 
     data = {'account': 'REQUESTER1'}
 
     response = requests.post('http://127.0.0.1:5000/get_account', json=data)
     print('REQUESTER1')
-    print(response.text)
+    assert response.text is not None
+
+    response = requests.post('http://127.0.0.1:5000/get_account', json=data)
+    print('REQUESTER1')
+    assert response.text is not None
