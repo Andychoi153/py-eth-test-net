@@ -167,7 +167,10 @@ class SendDetectData(Resource):
             # parser.add_argument('ses_addr', type=str)
             # parser.add_argument('mes_addr', type=str)
             parser.add_argument('req_addr', type=str)
-            parser.add_argument('data', type=dict)
+            # parser.add_argument('data', type=dict)
+            parser.add_argument('hash', type=str)
+            parser.add_argument('age', type=str)
+            parser.add_argument('name', type=str)
             parser.add_argument('time_stamp', type=str)
             parser.add_argument('db_image', type=str)
             # log.debug(parser['ses_addr'])
@@ -175,13 +178,9 @@ class SendDetectData(Resource):
             args = parser.parse_args()
             _eth_worker._pool.append({
                 "Requester": args['req_addr'],
-                "data": {
-                    'hash': str(args['data']['hash']),
-                    'solution': {
-                        'name': args['data']['sol']['name'],
-                        'age': args['data']['sol']['age']
-                    },
-                },
+                "hash": args['hash'],
+                "name": args['name'],
+                "age": args['age'],
                 "time_stamp": args['time_stamp']
             })
 
@@ -217,9 +216,9 @@ class MiningBlock(Resource):
                                              contract_code,
                                              sender_id=ENUMS[pool['Requester']],
                                              receiver_id=ENUMS['MES'],
-                                             hashData=str(pool['data']['hash']),
-                                             name=str(pool['data']['solution']['name']),
-                                             age=str(pool['data']['solution']['age']),
+                                             hashData=pool['hash'],
+                                             name=pool['name'],
+                                             age=pool['age'],
                                              time_stamp=pool['time_stamp']
                                              )
 
@@ -330,9 +329,9 @@ class MineBlock:
                                                  contract_code,
                                                  sender_id=ENUMS[pool['Requester']],
                                                  receiver_id=ENUMS['MES'],
-                                                 hashData=str(pool['data']['hash']),
-                                                 name=str(pool['data']['solution']['name']),
-                                                 age=str(pool['data']['solution']['age']),
+                                                 hashData=pool['hash'],
+                                                 name=pool['name'],
+                                                 age=pool['age'],
                                                  time_stamp=pool['time_stamp']
                                                  )
 
