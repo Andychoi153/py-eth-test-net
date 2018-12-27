@@ -297,9 +297,9 @@ class SendBlockInfo(Resource):
 
 
             return {
-                "status": 200,
-                "pool_list":  pool,
-                "in_block": in_block
+                'status': 200,
+                'pool_list':  pool,
+                'in_block': in_block
             }
         except Exception as e:
             return {
