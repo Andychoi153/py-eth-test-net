@@ -290,10 +290,10 @@ class SendBlockInfo(Resource):
         try:
             pool = []
             for i in _eth_worker._pool:
-                pool.append(str(i))
+                pool.append(i)
             in_block = []
             for i in _eth_worker._in_block:
-                in_block.append(str(i))
+                in_block.append(i)
 
 
 
