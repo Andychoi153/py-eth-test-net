@@ -1,6 +1,6 @@
 CodernityDB==0.5.0
 PyYAML==3.13
-Pygments==2.2.0
+Pygments==2.7.4
 Werkzeug==0.14.1
 argparse==1.2.1
 arrow==0.12.1
